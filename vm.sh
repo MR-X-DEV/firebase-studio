@@ -478,11 +478,12 @@ start_vm() {
 
         # Add port forwards if specified
         if [[ -n "$PORT_FORWARDS" ]]; then
+            local count=1
             IFS=',' read -ra forwards <<< "$PORT_FORWARDS"
             for forward in "${forwards[@]}"; do
                 IFS=':' read -r host_port guest_port <<< "$forward"
-                qemu_cmd+=(-device "virtio-net-pci,netdev=n${#qemu_cmd[@]}")
-                qemu_cmd+=(-netdev "user,id=n${#qemu_cmd[@]},hostfwd=tcp::$host_port-:$guest_port")
+                qemu_cmd+=(-netdev "user,id=n$count,hostfwd=tcp::$host_port-:$guest_port" -device "virtio-net-pci,netdev=n$count")
+                ((count++))
             done
         fi
 
